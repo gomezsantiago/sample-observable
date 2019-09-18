@@ -1,9 +1,12 @@
 const { Observable, fromEvent, operators, EMPTY} = rxjs;
-const {map, switchMap, takeUntil, take} = operators;
+const {map, switchMap, takeUntil, take, scan} = operators;
 
-const myButton = document.getElementById('da-button');
 var clicked = false;
+const myButton = document.getElementById('da-button');
+const myInput = document.getElementById('da-input');
+
 const btnClick$ = fromEvent(myButton, 'click');
+const input$ = fromEvent(myInput, 'input');
 const mouseMove$ = fromEvent(document, 'mousemove');
 
 const observer = {
@@ -13,6 +16,7 @@ const observer = {
   },
   complete: () => console.log('done!')
 };
+
 btnClick$.pipe(
   map((event) => {
     clicked = !clicked
@@ -23,3 +27,10 @@ btnClick$.pipe(
 
 ).subscribe(observer);
 
+
+input$.pipe(
+  scan(((acc, {data}) => (data == null ? '': acc+data)),'')
+).subscribe((inputText)=> {
+  myInput.value = inputText;
+  myButton.textContent = inputText.trim() ? inputText:'Click Me';
+})
