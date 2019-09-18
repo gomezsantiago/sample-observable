@@ -1,5 +1,5 @@
 const { Observable, fromEvent, operators, EMPTY} = rxjs;
-const {map, switchMap, takeUntil, take, scan} = operators;
+const {map, switchMap, takeUntil, take, scan, tap} = operators;
 
 var clicked = false;
 const myButton = document.getElementById('da-button');
@@ -14,19 +14,18 @@ const observer = {
     myButton.style.top = `${pos.y}px`;
     myButton.style.left = `${pos.x}px`;
   },
-  complete: () => console.log('done!')
+  error: (data) => console.error('Error ',data),
+  complete: (data) => console.log('done!: ', data)
 };
 
 btnClick$.pipe(
-  map((event) => {
+  tap(() => {
     clicked = !clicked
-    console.log(`Button ${clicked? `clicked x-position: ${event.clientX}, y-position: ${event.clientY}` : 'unclicked'}`)
   }),
-  switchMap(() => clicked? mouseMove$: EMPTY),
-  map(({clientX, clientY}) => { console.log(`moving to (x,y): (${clientX},${clientY})`,); return {x: clientX, y: clientY}}),
+  switchMap(() => (clicked ? mouseMove$ : EMPTY)),
+  map(({clientX, clientY}) => { return {x: clientX, y: clientY}}),
 
 ).subscribe(observer);
-
 
 input$.pipe(
   scan(((acc, {data}) => (data == null ? '': acc+data)),'')
