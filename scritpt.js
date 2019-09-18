@@ -19,7 +19,7 @@ btnClick$.pipe(
     console.log(`Button ${clicked? `clicked x-position: ${event.clientX}, y-position: ${event.clientY}` : 'unclicked'}`)
   }),
   switchMap(() => clicked? mouseMove$: EMPTY),
-  map((event) => ({x: event.clientX, y: event.clientY})),
+  map(({clientX, clientY}) => { console.log(`moving to (x,y): (${clientX},${clientY})`,); return {x: clientX, y: clientY}}),
 
 ).subscribe(observer);
 
